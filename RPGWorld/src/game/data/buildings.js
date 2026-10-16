@@ -41,6 +41,8 @@ const buildings = [
     height: 100
   },
 
+  image: "austin",
+
 },
 
 {
@@ -79,6 +81,8 @@ const buildings = [
     width: 140,
     height: 100
   },
+
+  image: "healthCenter",
 },
 
 {
