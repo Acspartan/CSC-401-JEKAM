@@ -1,7 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
+import buildingImages from "../data/buildingImages";
 
 export default function Building({ building }) {
+  const imageSource = buildingImages[building.image];
+
   return (
     <View
       style={[
@@ -14,9 +17,17 @@ export default function Building({ building }) {
         },
       ]}
     >
-      <Text style={styles.buildingEmoji}>🏫</Text>
+      {imageSource ? (
+        <Image
+          source={imageSource}
+          style={styles.buildingImage}
+          resizeMode="contain"
+        />
+      ) : (
+        <Text style={styles.buildingEmoji}>🏫</Text>
+      )}
 
-      <Text style={styles.buildingName}>
+      <Text style={styles.buildingName} numberOfLines={2}>
         {building.name}
       </Text>
     </View>
@@ -29,6 +40,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  buildingImage: {
+    width: "100%",
+    height: "70%",
   },
 
   buildingEmoji: {

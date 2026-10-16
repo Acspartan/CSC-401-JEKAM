@@ -16,7 +16,7 @@ const buildings = [
     height: 100
   },
 
-  //image: "brevard",
+  image: "brevard",
 
   //interaction: {
     //enterable: true,
