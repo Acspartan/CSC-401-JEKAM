@@ -41,6 +41,8 @@ const buildings = [
     height: 100
   },
 
+  image: "austin",
+
 },
 
 {
@@ -51,7 +53,7 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1326,
+    x: 1200,
     y: 744
   },
 
@@ -59,6 +61,8 @@ const buildings = [
     width: 140,
     height: 100
   },
+
+  image: "vaughn",
 },
 
 {
@@ -77,6 +81,8 @@ const buildings = [
     width: 140,
     height: 100
   },
+
+  image: "healthCenter",
 },
 
 {
@@ -95,6 +101,9 @@ const buildings = [
     width: 140,
     height: 100
   },
+
+  image: "palm",
+  
 },
 {
   id: "mackechnie",
