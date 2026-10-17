@@ -1,4 +1,4 @@
-import { Character } from "./Character";
+import { Character } from "./character";
 
 export class Player extends Character {
     username: string;

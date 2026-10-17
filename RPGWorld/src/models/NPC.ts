@@ -1,4 +1,4 @@
-import { Character } from "./Character";
+import { Character } from "./character";
 
 export class NPC extends Character {
     npcType: string;
