@@ -5,12 +5,12 @@ import { View, Text, StyleSheet } from "react-native";
 export default function PlayableCharacter({ x, y }) {
     return (
         <View
-            pointerEvents="none"
             style={[
                 styles.player,
                 {
                     left: x,
                     top: y,
+                    pointerEvents: "none",
                 },
             ]}
         >
