@@ -11,13 +11,14 @@ import {
 import buildings from "./data/buildings";
 import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
+import QuestWindow from "./components/QuestWindow";
 
 // Character -> Player -> PlayableCharacter
 import {
-  PlayableCharacter as PlayableCharacterModel
+  PlayableCharacter as PlayableCharacterModel,
 } from "../models/PlayableCharacter";
 
-// Campus world dimensions
+// Campus dimensions
 const WORLD_WIDTH = 2100;
 const WORLD_HEIGHT = 1250;
 
@@ -27,7 +28,7 @@ const PLAYER_HEIGHT = 48;
 
 export default function GameWorld() {
 
-  // Create the playable character using inheritance
+  // Create player from inherited class
   const [player, setPlayer] = useState(() =>
       new PlayableCharacterModel(
           "Hero",
@@ -40,12 +41,13 @@ export default function GameWorld() {
       )
   );
 
-  // Handle character movement
-  const movePlayer = useCallback((direction) => {
+  // Controls Quest window visibility
+  const [questOpen, setQuestOpen] = useState(false);
 
+  // Move player using PlayableCharacter class
+  const movePlayer = useCallback((direction) => {
     setPlayer((previous) => {
 
-      // Create a new instance of the actual class
       const updated = new PlayableCharacterModel(
           previous.name,
           previous.health,
@@ -56,11 +58,10 @@ export default function GameWorld() {
           previous.y
       );
 
-      // Preserve character attributes
+      // Preserve player progress
       updated.experience = previous.experience;
       updated.speed = previous.speed;
 
-      // Use the movement methods in PlayableCharacter.ts
       switch (direction) {
         case "up":
           updated.moveUp();
@@ -82,7 +83,7 @@ export default function GameWorld() {
           return previous;
       }
 
-      // Prevent movement outside the map
+      // Keep player inside campus boundaries
       updated.x = Math.max(
           0,
           Math.min(
@@ -101,10 +102,9 @@ export default function GameWorld() {
 
       return updated;
     });
-
   }, []);
 
-  // Keyboard controls for Expo Web
+  // Keyboard movement for Expo Web
   useEffect(() => {
 
     if (typeof window === "undefined") {
@@ -113,23 +113,30 @@ export default function GameWorld() {
 
     const handleKeyDown = (event) => {
 
-      const key = event.key.toLowerCase();
+      // Ignore typing inside input fields
+      const tag = event.target?.tagName;
+
+      if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          event.target?.isContentEditable
+      ) {
+        return;
+      }
 
       const directions = {
         w: "up",
         arrowup: "up",
-
         s: "down",
         arrowdown: "down",
-
         a: "left",
         arrowleft: "left",
-
         d: "right",
         arrowright: "right",
       };
 
-      const direction = directions[key];
+      const direction =
+          directions[event.key.toLowerCase()];
 
       if (direction) {
         event.preventDefault();
@@ -137,10 +144,7 @@ export default function GameWorld() {
       }
     };
 
-    window.addEventListener(
-        "keydown",
-        handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener(
@@ -154,7 +158,7 @@ export default function GameWorld() {
   return (
       <View style={styles.container}>
 
-        {/* Vertical campus scrolling */}
+        {/* CAMPUS MAP */}
         <ScrollView
             style={styles.screen}
             contentContainerStyle={{
@@ -164,7 +168,6 @@ export default function GameWorld() {
             bounces={false}
         >
 
-          {/* Horizontal campus scrolling */}
           <ScrollView
               horizontal
               contentContainerStyle={{
@@ -174,10 +177,9 @@ export default function GameWorld() {
               bounces={false}
           >
 
-            {/* Campus map */}
             <View style={styles.gameWorld}>
 
-              {/* Existing buildings */}
+              {/* Existing campus buildings */}
               {buildings.map((building) => (
                   <Building
                       key={building.id}
@@ -197,10 +199,10 @@ export default function GameWorld() {
 
         </ScrollView>
 
-        {/* Movement controls */}
+        {/* DIRECTIONAL CONTROLS */}
         <View style={styles.controls}>
 
-          {/* Move up */}
+          {/* Up */}
           <Pressable
               style={styles.button}
               onPress={() => movePlayer("up")}
@@ -212,7 +214,7 @@ export default function GameWorld() {
 
           <View style={styles.horizontalControls}>
 
-            {/* Move left */}
+            {/* Left */}
             <Pressable
                 style={styles.button}
                 onPress={() => movePlayer("left")}
@@ -222,7 +224,7 @@ export default function GameWorld() {
               </Text>
             </Pressable>
 
-            {/* Move down */}
+            {/* Down */}
             <Pressable
                 style={styles.button}
                 onPress={() => movePlayer("down")}
@@ -232,7 +234,7 @@ export default function GameWorld() {
               </Text>
             </Pressable>
 
-            {/* Move right */}
+            {/* Right */}
             <Pressable
                 style={styles.button}
                 onPress={() => movePlayer("right")}
@@ -245,6 +247,23 @@ export default function GameWorld() {
           </View>
 
         </View>
+
+        {/* QUEST WINDOW */}
+        {questOpen && (
+            <View style={styles.questPanel}>
+              <QuestWindow player={player} />
+            </View>
+        )}
+
+        {/* BOTTOM-LEFT QUEST BUTTON */}
+        <Pressable
+            style={styles.questButton}
+            onPress={() => setQuestOpen((previous) => !previous)}
+        >
+          <Text style={styles.questButtonText}>
+            {questOpen ? "Close Quests" : "Quests"}
+          </Text>
+        </Pressable>
 
       </View>
   );
@@ -267,6 +286,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#7ec850",
   },
 
+  // Fixed Quest Log and Character Status panel
+  questPanel: {
+    position: "absolute",
+    bottom: 90,
+    left: 20,
+    width: 300,
+    height: 520,
+    zIndex: 1500,
+    elevation: 10,
+  },
+
+  // Bottom-left Quest button
+  questButton: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    backgroundColor: "#252525",
+    borderWidth: 2,
+    borderColor: "#888888",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 22,
+    zIndex: 2000,
+    elevation: 11,
+  },
+
+  questButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  // Directional controls
   controls: {
     position: "absolute",
     bottom: 20,
