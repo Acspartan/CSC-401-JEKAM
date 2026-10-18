@@ -7,8 +7,8 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1105,
-    y: 717
+    x: 1085,
+    y: 760
   },
 
   size: {
@@ -32,8 +32,8 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1203,
-    y: 891
+    x: 1165,
+    y: 900
   },
 
   size: {
@@ -73,8 +73,8 @@ const buildings = [
   type: "medical",
 
   position: {
-    x: 1121,
-    y: 891
+    x: 1100,
+    y: 944
   },
 
   size: {
@@ -93,7 +93,7 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1005,
+    x: 900,
     y: 735
   },
 
@@ -114,7 +114,7 @@ const buildings = [
 
   position: {
     x: 1016,
-    y: 1013
+    y: 975
   },
 
   size: {
@@ -133,7 +133,7 @@ const buildings = [
 
   position: {
     x: 904,
-    y: 800
+    y: 875
   },
 
   size: {
@@ -170,8 +170,8 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 1298,
-    y: 430
+    x: 1200,
+    y: 480
   },
 
   size: {
@@ -190,8 +190,8 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 1439,
-    y: 536
+    x: 1310,
+    y: 575
   },
 
   size: {
@@ -383,8 +383,8 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 722,
-    y: 745
+    x: 730,
+    y: 860
   },
 
   size: {
