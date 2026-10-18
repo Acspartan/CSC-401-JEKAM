@@ -4,6 +4,12 @@ const buildingImages = {
   vaughn: require("../assets/buildings/vaughn.png"),
   austin: require("../assets/buildings/austin.png"),
   healthCenter: require("../assets/buildings/healthCenter.png"),
+  jenkinsHall: require("../assets/buildings/jenkinsHall.png"),
+  ICB: require("../assets/buildings/ICB.png"),
+  mackechnie: require("../assets/buildings/mackechnie.png"),
+  sykesCOB: require("../assets/buildings/sykesCollegeOfBusiness.png"),
+  smiley: require("../assets/buildings/smiley.png"),
+  plant: require("../assets/buildings/plant.png"),
 };
 
 export default buildingImages;

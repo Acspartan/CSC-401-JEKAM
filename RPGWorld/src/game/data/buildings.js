@@ -12,8 +12,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 133,
+    height: 125
   },
 
   image: "brevard",
@@ -37,8 +37,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 57,
+    height: 147
   },
 
   image: "austin",
@@ -58,8 +58,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 121,
+    height: 197
   },
 
   image: "vaughn",
@@ -78,8 +78,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 58,
+    height: 58
   },
 
   image: "healthCenter",
@@ -98,8 +98,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 155,
+    height: 162
   },
 
   image: "palm",
@@ -118,9 +118,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 52,
+    height: 85
   },
+
+  image: "mackechnie",
 },
 {
   id: "jenkins",
@@ -131,13 +133,15 @@ const buildings = [
 
   position: {
     x: 904,
-    y: 962
+    y: 800
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 98,
+    height: 177
   },
+
+  image: "jenkinsHall",
 },
 
 {
@@ -171,9 +175,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 116,
+    height: 200
   },
+  
+  image: "sykesCOB",
 },
 
 {
@@ -189,9 +195,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 104,
+    height: 144
   },
+
+  image: "smiley",
 },
 {
   id: "plant",
@@ -201,14 +209,16 @@ const buildings = [
   type: "multi-purpose",
 
   position: {
-    x: 1634,
-    y: 556
+    x: 1600,
+    y: 400
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 223,
+    height: 491
   },
+
+  image: "plant",
 },
 {
   id: "mckay",
@@ -378,9 +388,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 127,
+    height: 127
   },
+
+  image: "ICB",
 },
 {
   id: "BAS",
