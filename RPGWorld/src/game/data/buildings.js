@@ -1,3 +1,6 @@
+// for the birds eye view map
+// information of buildings on campus in regards to their location, name, and building type
+
 const buildings = [
   {
   id: "brevard",
@@ -7,16 +10,18 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1105,
-    y: 717
+    x: 1085,
+    y: 760
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 133,
+    height: 125
   },
 
   image: "brevard",
+
+  // for future use
 
   //interaction: {
     //enterable: true,
@@ -32,13 +37,13 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1203,
-    y: 891
+    x: 1165,
+    y: 900
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 57,
+    height: 147
   },
 
   image: "austin",
@@ -58,8 +63,8 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 121,
+    height: 197
   },
 
   image: "vaughn",
@@ -73,13 +78,13 @@ const buildings = [
   type: "medical",
 
   position: {
-    x: 1121,
-    y: 891
+    x: 1100,
+    y: 944
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 58,
+    height: 58
   },
 
   image: "healthCenter",
@@ -93,13 +98,13 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1005,
+    x: 900,
     y: 735
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 155,
+    height: 162
   },
 
   image: "palm",
@@ -114,13 +119,15 @@ const buildings = [
 
   position: {
     x: 1016,
-    y: 1013
+    y: 975
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 52,
+    height: 85
   },
+
+  image: "mackechnie",
 },
 {
   id: "jenkins",
@@ -131,13 +138,15 @@ const buildings = [
 
   position: {
     x: 904,
-    y: 962
+    y: 875
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 98,
+    height: 177
   },
+
+  image: "jenkinsHall",
 },
 
 {
@@ -148,14 +157,16 @@ const buildings = [
   type: "religious",
 
   position: {
-    x: 1147,
-    y: 563
+    x: 1100,
+    y: 700
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 106,
+    height: 56
   },
+
+  image: "chapel",
 },
 
 {
@@ -166,14 +177,16 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 1298,
-    y: 430
+    x: 1200,
+    y: 480
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 116,
+    height: 200
   },
+  
+  image: "sykesCOB",
 },
 
 {
@@ -184,14 +197,16 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 1439,
-    y: 536
+    x: 1310,
+    y: 575
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 104,
+    height: 144
   },
+
+  image: "smiley",
 },
 {
   id: "plant",
@@ -201,14 +216,16 @@ const buildings = [
   type: "multi-purpose",
 
   position: {
-    x: 1634,
-    y: 556
+    x: 1350,
+    y: 375
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 223,
+    height: 491
   },
+
+  image: "plant",
 },
 {
   id: "mckay",
@@ -218,14 +235,16 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1666,
-    y: 215
+    x: 1500,
+    y: 350
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 151,
+    height: 206
   },
+
+  image: "mckay",
 },
 {
   id: "sfb",
@@ -293,9 +312,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 57,
+    height: 178
   },
+
+  image: "straz",
 },
 {
   id: "pepin",
@@ -323,7 +344,7 @@ const buildings = [
 
   position: {
     x: 851,
-    y: 556
+    y: 650
   },
 
   size: {
@@ -339,8 +360,8 @@ const buildings = [
   type: "athletic",
 
   position: {
-    x: 978,
-    y: 542
+    x: 955,
+    y: 650
   },
 
   size: {
@@ -373,14 +394,16 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 722,
-    y: 745
+    x: 730,
+    y: 860
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 127,
+    height: 127
   },
+
+  image: "ICB",
 },
 {
   id: "BAS",
@@ -436,24 +459,6 @@ const buildings = [
 },
 
 {
-  id: "GHS",
-
-  name: "Health and Technology Building - Health",
-
-  type: "academic",
-
-  position: {
-    x: 1026,
-    y: 349
-  },
-
-  size: {
-    width: 140,
-    height: 100
-  },
-},
-
-{
   id: "TECH",
 
   name: "Health and Technology Building - Technology",
@@ -462,14 +467,36 @@ const buildings = [
 
   position: {
     x: 1026,
-    y: 260
+    y: 450
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 56,
+    height: 234
   },
+
+  image: "jenkinsHealthTech",
 },
+
+{
+  id: "morsani",
+
+  name: "Morsani Hall",
+
+  type: "dorm",
+
+  position: {
+    x: 1000,
+    y: 250
+  },
+
+  size: {
+    width: 93,
+    height: 210
+  },
+
+  image: "morsani",
+}
 
 
 
