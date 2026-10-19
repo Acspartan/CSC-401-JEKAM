@@ -14,6 +14,7 @@ const buildingImages = {
   chapel: require("../assets/buildings/chapel.png"),
   morsani: require("../assets/buildings/morsani.png"),
   jenkinsHealthTech: require("../assets/buildings/jenkinsHealthTech.png"),
+  straz: require("../assets/buildings/Straz.png"),
 };
 
 export default buildingImages;

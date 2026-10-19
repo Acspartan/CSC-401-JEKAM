@@ -307,9 +307,11 @@ const buildings = [
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 57,
+    height: 178
   },
+
+  image: "straz",
 },
 {
   id: "pepin",
@@ -337,7 +339,7 @@ const buildings = [
 
   position: {
     x: 851,
-    y: 556
+    y: 650
   },
 
   size: {
@@ -353,8 +355,8 @@ const buildings = [
   type: "athletic",
 
   position: {
-    x: 978,
-    y: 542
+    x: 955,
+    y: 650
   },
 
   size: {
@@ -460,7 +462,7 @@ const buildings = [
 
   position: {
     x: 1026,
-    y: 320
+    y: 450
   },
 
   size: {
@@ -480,7 +482,7 @@ const buildings = [
 
   position: {
     x: 1000,
-    y: 150
+    y: 250
   },
 
   size: {
