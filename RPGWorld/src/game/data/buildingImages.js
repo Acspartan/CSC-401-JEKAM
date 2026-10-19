@@ -10,6 +10,10 @@ const buildingImages = {
   sykesCOB: require("../assets/buildings/sykesCollegeOfBusiness.png"),
   smiley: require("../assets/buildings/smiley.png"),
   plant: require("../assets/buildings/plant.png"),
+  mckay: require("../assets/buildings/mckay.png"),
+  chapel: require("../assets/buildings/chapel.png"),
+  morsani: require("../assets/buildings/morsani.png"),
+  jenkinsHealthTech: require("../assets/buildings/jenkinsHealthTech.png"),
 };
 
 export default buildingImages;

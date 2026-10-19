@@ -152,14 +152,16 @@ const buildings = [
   type: "religious",
 
   position: {
-    x: 1147,
-    y: 563
+    x: 1100,
+    y: 700
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 106,
+    height: 56
   },
+
+  image: "chapel",
 },
 
 {
@@ -209,8 +211,8 @@ const buildings = [
   type: "multi-purpose",
 
   position: {
-    x: 1600,
-    y: 400
+    x: 1350,
+    y: 375
   },
 
   size: {
@@ -228,14 +230,16 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1666,
-    y: 215
+    x: 1500,
+    y: 350
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 151,
+    height: 206
   },
+
+  image: "mckay",
 },
 {
   id: "sfb",
@@ -448,24 +452,6 @@ const buildings = [
 },
 
 {
-  id: "GHS",
-
-  name: "Health and Technology Building - Health",
-
-  type: "academic",
-
-  position: {
-    x: 1026,
-    y: 349
-  },
-
-  size: {
-    width: 140,
-    height: 100
-  },
-},
-
-{
   id: "TECH",
 
   name: "Health and Technology Building - Technology",
@@ -474,14 +460,36 @@ const buildings = [
 
   position: {
     x: 1026,
-    y: 260
+    y: 320
   },
 
   size: {
-    width: 140,
-    height: 100
+    width: 56,
+    height: 234
   },
+
+  image: "jenkinsHealthTech",
 },
+
+{
+  id: "morsani",
+
+  name: "Morsani Hall",
+
+  type: "dorm",
+
+  position: {
+    x: 1000,
+    y: 150
+  },
+
+  size: {
+    width: 93,
+    height: 210
+  },
+
+  image: "morsani",
+}
 
 
 
