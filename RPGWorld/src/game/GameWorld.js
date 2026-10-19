@@ -161,6 +161,7 @@ export default function GameWorld() {
       <View style={styles.container}>
 
         {/* CAMPUS MAP */}
+        {/* Scroll added to accomidate different screen sizes */}
         <ScrollView
             style={styles.screen}
             contentContainerStyle={{

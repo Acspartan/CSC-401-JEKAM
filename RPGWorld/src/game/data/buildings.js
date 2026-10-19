@@ -1,3 +1,6 @@
+// for the birds eye view map
+// information of buildings on campus in regards to their location, name, and building type
+
 const buildings = [
   {
   id: "brevard",
@@ -17,6 +20,8 @@ const buildings = [
   },
 
   image: "brevard",
+
+  // for future use
 
   //interaction: {
     //enterable: true,
