@@ -13,6 +13,7 @@ import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
 import QuestWindow from "./components/QuestWindow";
 
+
 // Character -> Player -> PlayableCharacter
 import {
   PlayableCharacter as PlayableCharacterModel,
@@ -25,6 +26,7 @@ const WORLD_HEIGHT = 1250;
 // Player dimensions
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
+
 
 export default function GameWorld() {
 
@@ -159,6 +161,7 @@ export default function GameWorld() {
       <View style={styles.container}>
 
         {/* CAMPUS MAP */}
+        {/* Scroll added to accomidate different screen sizes */}
         <ScrollView
             style={styles.screen}
             contentContainerStyle={{

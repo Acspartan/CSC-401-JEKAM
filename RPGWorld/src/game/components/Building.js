@@ -8,7 +8,9 @@ export default function Building({ building }) {
   return (
     <View
       style={[
+        
         styles.building,
+        /* Building Positioning  */
         {
           left: building.position.x,
           top: building.position.y,
@@ -16,6 +18,7 @@ export default function Building({ building }) {
           height: building.size.height,
         },
       ]}
+       /* Images/Layout for each building  */
     >
       {imageSource ? (
         <Image
@@ -24,6 +27,8 @@ export default function Building({ building }) {
           resizeMode="contain"
         />
       ) : (
+         /* Fall back emoji if no image is added  */
+         /* Caps amount of space the text can take up on the map  */
         <Text style={styles.buildingEmoji}>🏫</Text>
       )}
 
@@ -34,6 +39,7 @@ export default function Building({ building }) {
   );
 }
 
+// building styling
 const styles = StyleSheet.create({
   building: {
     position: "absolute",
