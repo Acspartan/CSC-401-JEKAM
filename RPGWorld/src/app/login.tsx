@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   View,
@@ -6,30 +5,51 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
+import { supabase } from "../../lib/supabase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (!email.trim() || !password) {
+  const handleLogin = async () => {
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail || !password) {
       setMessage("Please enter your email and password.");
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       setMessage("Please enter a valid email address.");
       return;
     }
 
-    // Temporary frontend validation only.
-    // Supabase authentication will be added in a future sprint.
-    setMessage(
-      "Login form validated! Authentication will be connected in a future sprint."
-    );
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error) {
+        setMessage(error.message);
+        return;
+      }
+
+      // TODO: Replace with your game's authenticated home screen.
+      router.replace("/");
+    } catch {
+      setMessage("Unable to connect. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,6 +62,7 @@ export default function Login() {
         placeholder="Email"
         placeholderTextColor="#aaa"
         autoCapitalize="none"
+        autoCorrect={false}
         keyboardType="email-address"
         value={email}
         onChangeText={(text) => {
@@ -66,8 +87,16 @@ export default function Login() {
         <Text style={styles.message}>{message}</Text>
       ) : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Log In</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Log In</Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/signup")}>
