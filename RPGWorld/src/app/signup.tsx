@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   View,
@@ -6,22 +5,34 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
+import { supabase } from "../../lib/supabase";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-    if (!email.trim() || !password || !confirmPassword) {
+  const handleSignUp = async () => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim();
+
+    if (
+      !normalizedEmail ||
+      !normalizedUsername ||
+      !password ||
+      !confirmPassword
+    ) {
       setMessage("Please fill in all fields.");
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       setMessage("Please enter a valid email address.");
       return;
     }
@@ -36,9 +47,41 @@ export default function SignUp() {
       return;
     }
 
-    setMessage(
-      "Form validated! Account creation will be available when the backend is connected."
-    );
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          data: {
+            username: normalizedUsername,
+          },
+        },
+      });
+
+      if (error) {
+        setMessage(error.message);
+        return;
+      }
+
+      if (data.session) {
+        setMessage("Account created! Taking you into the game...");
+        router.replace("/");
+      } else {
+        setMessage(
+          "Account created! Check your email to confirm your account, then log in."
+        );
+      }
+    } catch (error) {
+      console.error("Supabase signup error:", error);
+      setMessage(
+        "Could not connect to the server. Check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,10 +94,20 @@ export default function SignUp() {
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Username"
           placeholderTextColor="#aaa"
           autoCapitalize="none"
+          value={username}
+          onChangeText={setUsername}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
           keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
           value={email}
           onChangeText={setEmail}
         />
@@ -84,8 +137,13 @@ export default function SignUp() {
         <TouchableOpacity
           style={styles.button}
           onPress={handleSignUp}
+          disabled={loading}
         >
-          <Text style={styles.buttonText}>Create Account</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.buttonText}>Create Account</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.replace("/login")}>
