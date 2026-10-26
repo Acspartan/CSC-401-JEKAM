@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
     View,
@@ -8,8 +7,35 @@ import {
     StyleSheet,
 } from "react-native";
 
-// Example quests
-const quests = [
+// Starting quests
+export const initialQuests = [
+    {
+        id: 4,
+        title: "Getting to Know the Game",
+        description:
+            "Explore the campus by visiting three important buildings.",
+        objectives: [
+            {
+                id: "mackay",
+                text: "Walk to McKay Hall",
+                completed: false,
+            },
+            {
+                id: "morsani",
+                text: "Walk to Morsani Hall",
+                completed: false,
+            },
+            {
+                id: "jenkins",
+                text: "Walk to Jenkins Health and Technology Building",
+                completed: false,
+            },
+        ],
+        reward: "Level up once",
+        completed: false,
+        status: "in_progress",
+    },
+
     {
         id: 1,
         title: "Explore Campus",
@@ -22,6 +48,7 @@ const quests = [
         reward: "100 XP",
         completed: false,
     },
+
     {
         id: 2,
         title: "First Steps",
@@ -35,21 +62,25 @@ const quests = [
         reward: "50 XP",
         completed: false,
     },
+
     {
         id: 3,
         title: "Welcome to Campus",
         description: "Begin your journey as a new student.",
-        objectives: [
-            "Enter the campus",
-        ],
+        objectives: ["Enter the campus"],
         reward: "25 XP",
         completed: true,
     },
 ];
 
-export default function QuestWindow({ player }) {
+export default function QuestWindow({
+                                        player,
+                                        quests = initialQuests,
+                                    }) {
+    // Controls which quest tab is displayed
     const [selectedTab, setSelectedTab] = useState("Active");
 
+    // Separate active and completed quests
     const visibleQuests = quests.filter((quest) =>
         selectedTab === "Completed"
             ? quest.completed
@@ -112,16 +143,16 @@ export default function QuestWindow({ player }) {
                 </Text>
             </View>
 
-            {/* ACTIVE / COMPLETED TABS */}
+            {/* QUEST TABS */}
             <View style={styles.tabs}>
+
                 {["Active", "Completed"].map((tab) => (
                     <Pressable
                         key={tab}
                         onPress={() => setSelectedTab(tab)}
                         style={[
                             styles.tab,
-                            selectedTab === tab &&
-                            styles.activeTab,
+                            selectedTab === tab && styles.activeTab,
                         ]}
                     >
                         <Text style={styles.tabText}>
@@ -129,6 +160,7 @@ export default function QuestWindow({ player }) {
                         </Text>
                     </Pressable>
                 ))}
+
             </View>
 
             {/* QUEST LIST */}
@@ -137,40 +169,91 @@ export default function QuestWindow({ player }) {
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
             >
-                {visibleQuests.map((quest) => (
-                    <View
-                        key={quest.id}
-                        style={styles.questCard}
-                    >
-                        <Text style={styles.questTitle}>
-                            {quest.title}
-                        </Text>
 
-                        <Text style={styles.description}>
-                            {quest.description}
-                        </Text>
+                {visibleQuests.length === 0 && (
+                    <Text style={styles.emptyMessage}>
+                        {selectedTab === "Completed"
+                            ? "No completed quests yet."
+                            : "No active quests available."}
+                    </Text>
+                )}
 
-                        <Text style={styles.sectionTitle}>
-                            Objectives
-                        </Text>
+                {visibleQuests.map((quest) => {
 
-                        {quest.objectives.map(
-                            (objective, index) => (
-                                <Text
-                                    key={index}
-                                    style={styles.objective}
-                                >
-                                    {quest.completed ? "✓" : "□"}{" "}
-                                    {objective}
+                    // Count completed objectives
+                    const completedCount = quest.objectives.filter(
+                        (objective) =>
+                            typeof objective === "object" &&
+                            objective !== null
+                                ? objective.completed
+                                : quest.completed
+                    ).length;
+
+                    return (
+                        <View
+                            key={quest.id}
+                            style={styles.questCard}
+                        >
+
+                            {/* Quest title */}
+                            <Text style={styles.questTitle}>
+                                {quest.title}
+                            </Text>
+
+                            {/* Quest description */}
+                            <Text style={styles.description}>
+                                {quest.description}
+                            </Text>
+
+                            {/* Quest progress */}
+                            <Text style={styles.sectionTitle}>
+                                Objectives ({completedCount}/{quest.objectives.length})
+                            </Text>
+
+                            {/* Individual objectives */}
+                            {quest.objectives.map((objective, index) => {
+
+                                const isObject =
+                                    objective !== null &&
+                                    typeof objective === "object";
+
+                                const isCompleted = isObject
+                                    ? objective.completed
+                                    : quest.completed;
+
+                                const objectiveText = isObject
+                                    ? objective.text
+                                    : objective;
+
+                                return (
+                                    <Text
+                                        key={isObject ? objective.id : index}
+                                        style={[
+                                            styles.objective,
+                                            isCompleted && styles.completedObjective,
+                                        ]}
+                                    >
+                                        {isCompleted ? "✓" : "□"} {objectiveText}
+                                    </Text>
+                                );
+                            })}
+
+                            {/* Quest reward */}
+                            <Text style={styles.reward}>
+                                Reward: {quest.reward}
+                            </Text>
+
+                            {/* Completed quest message */}
+                            {quest.completed && (
+                                <Text style={styles.completedText}>
+                                    QUEST COMPLETED
                                 </Text>
-                            )
-                        )}
+                            )}
 
-                        <Text style={styles.reward}>
-                            Reward: {quest.reward}
-                        </Text>
-                    </View>
-                ))}
+                        </View>
+                    );
+                })}
+
             </ScrollView>
 
         </View>
@@ -179,7 +262,6 @@ export default function QuestWindow({ player }) {
 
 const styles = StyleSheet.create({
 
-    // Main permanent panel
     window: {
         width: "100%",
         height: "100%",
@@ -190,7 +272,6 @@ const styles = StyleSheet.create({
         padding: 10,
     },
 
-    // Character Status
     statusPanel: {
         backgroundColor: "#292929",
         borderWidth: 2,
@@ -237,7 +318,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
 
-    // Quest Log
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -319,11 +399,30 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
 
+    completedObjective: {
+        color: "#a5e6a5",
+        textDecorationLine: "line-through",
+    },
+
     reward: {
         color: "#a5e6a5",
         fontSize: 14,
         fontWeight: "bold",
         marginTop: 12,
+    },
+
+    completedText: {
+        color: "#a5e6a5",
+        fontSize: 13,
+        fontWeight: "bold",
+        marginTop: 10,
+    },
+
+    emptyMessage: {
+        color: "#AAAAAA",
+        fontSize: 14,
+        textAlign: "center",
+        marginTop: 20,
     },
 
 });

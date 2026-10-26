@@ -1,5 +1,5 @@
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
-import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -8,11 +8,17 @@ import {
   Pressable,
 } from "react-native";
 
+// Campus buildings
 import buildings from "./data/buildings";
+
+// Game components
 import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
-import QuestWindow from "./components/QuestWindow";
+import QuestWindow, { initialQuests } from "./components/QuestWindow";
 
+// Game systems
+import { isPlayerAtBuilding } from "./systems/buildingCollision";
+import { updateQuestProgress } from "./systems/questTracker";
 
 // Character -> Player -> PlayableCharacter
 import {
@@ -27,6 +33,49 @@ const WORLD_HEIGHT = 1250;
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
 
+// Introductory quest ID
+const INTRO_QUEST_ID = 4;
+
+// Match actual campus building IDs to quest objective IDs
+const QUEST_BUILDINGS = {
+  mckay: "mackay",
+  morsani: "morsani",
+  TECH: "jenkins",
+};
+
+// Create initial quest state
+function createInitialQuests() {
+  return initialQuests.map((quest) => ({
+    ...quest,
+    objectives: (quest.objectives ?? []).map((objective) =>
+        typeof objective === "object" && objective !== null
+            ? { ...objective }
+            : objective
+    ),
+  }));
+}
+
+// Create a new player while preserving progress
+function copyPlayer(previous, level = previous.level) {
+  const updated = new PlayableCharacterModel(
+      previous.name,
+      previous.health,
+      level,
+      previous.attackPower,
+      previous.username,
+      previous.x,
+      previous.y
+  );
+
+  updated.experience = previous.experience;
+  updated.speed = previous.speed;
+
+  // Preserve quest reward information
+  updated.introRewardClaimed =
+      previous.introRewardClaimed ?? false;
+
+  return updated;
+}
 
 export default function GameWorld() {
 
@@ -43,28 +92,27 @@ export default function GameWorld() {
       )
   );
 
-  // Controls Quest window visibility
+  // Store quest progress
+  const [quests, setQuests] = useState(createInitialQuests);
+
+  // Controls quest window visibility
   const [questOpen, setQuestOpen] = useState(false);
+
+  // Track visited buildings to avoid repeated updates
+  const visitedBuildings = useRef(new Set());
+
+  // Track whether introduction reward has been processed
+  const introRewardProcessed = useRef(false);
 
   // Move player using PlayableCharacter class
   const movePlayer = useCallback((direction) => {
+
     setPlayer((previous) => {
 
-      const updated = new PlayableCharacterModel(
-          previous.name,
-          previous.health,
-          previous.level,
-          previous.attackPower,
-          previous.username,
-          previous.x,
-          previous.y
-      );
-
-      // Preserve player progress
-      updated.experience = previous.experience;
-      updated.speed = previous.speed;
+      const updated = copyPlayer(previous);
 
       switch (direction) {
+
         case "up":
           updated.moveUp();
           break;
@@ -102,9 +150,104 @@ export default function GameWorld() {
           )
       );
 
+      // Avoid unnecessary updates if player cannot move
+      if (
+          updated.x === previous.x &&
+          updated.y === previous.y
+      ) {
+        return previous;
+      }
+
       return updated;
     });
+
   }, []);
+
+  // Detect building visits when player position changes
+  useEffect(() => {
+
+    const newlyVisited = [];
+
+    buildings.forEach((building) => {
+
+      // Only track buildings used by the introduction quest
+      const objectiveId = QUEST_BUILDINGS[building.id];
+
+      if (!objectiveId) {
+        return;
+      }
+
+      // Check if player overlaps the building
+      const isInside = isPlayerAtBuilding(
+          player,
+          building
+      );
+
+      if (
+          isInside &&
+          !visitedBuildings.current.has(building.id)
+      ) {
+
+        visitedBuildings.current.add(building.id);
+
+        newlyVisited.push(objectiveId);
+      }
+    });
+
+    if (newlyVisited.length === 0) {
+      return;
+    }
+
+    // Update quest objectives
+    setQuests((previousQuests) => {
+
+      let updatedQuests = previousQuests;
+
+      newlyVisited.forEach((objectiveId) => {
+        updatedQuests = updateQuestProgress(
+            updatedQuests,
+            objectiveId
+        );
+      });
+
+      return updatedQuests;
+    });
+
+  }, [player.x, player.y]);
+
+  // Award one level when introduction quest is completed
+  useEffect(() => {
+
+    const introQuest = quests.find(
+        (quest) => String(quest.id) === String(INTRO_QUEST_ID)
+    );
+
+    if (
+        !introQuest?.completed ||
+        introRewardProcessed.current
+    ) {
+      return;
+    }
+
+    introRewardProcessed.current = true;
+
+    setPlayer((previous) => {
+
+      if (previous.introRewardClaimed) {
+        return previous;
+      }
+
+      const updated = copyPlayer(
+          previous,
+          previous.level + 1
+      );
+
+      updated.introRewardClaimed = true;
+
+      return updated;
+    });
+
+  }, [quests]);
 
   // Keyboard movement for Expo Web
   useEffect(() => {
@@ -129,10 +272,13 @@ export default function GameWorld() {
       const directions = {
         w: "up",
         arrowup: "up",
+
         s: "down",
         arrowdown: "down",
+
         a: "left",
         arrowleft: "left",
+
         d: "right",
         arrowright: "right",
       };
@@ -146,7 +292,10 @@ export default function GameWorld() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+        "keydown",
+        handleKeyDown
+    );
 
     return () => {
       window.removeEventListener(
@@ -161,7 +310,7 @@ export default function GameWorld() {
       <View style={styles.container}>
 
         {/* CAMPUS MAP */}
-        {/* Scroll added to accomidate different screen sizes */}
+        {/* Scroll added to accommodate different screen sizes */}
         <ScrollView
             style={styles.screen}
             contentContainerStyle={{
@@ -254,14 +403,19 @@ export default function GameWorld() {
         {/* QUEST WINDOW */}
         {questOpen && (
             <View style={styles.questPanel}>
-              <QuestWindow player={player} />
+              <QuestWindow
+                  player={player}
+                  quests={quests}
+              />
             </View>
         )}
 
         {/* BOTTOM-LEFT QUEST BUTTON */}
         <Pressable
             style={styles.questButton}
-            onPress={() => setQuestOpen((previous) => !previous)}
+            onPress={() =>
+                setQuestOpen((previous) => !previous)
+            }
         >
           <Text style={styles.questButtonText}>
             {questOpen ? "Close Quests" : "Quests"}
