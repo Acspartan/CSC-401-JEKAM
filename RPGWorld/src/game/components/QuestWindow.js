@@ -47,6 +47,7 @@ export const initialQuests = [
         ],
         reward: "100 XP",
         completed: false,
+        status: "in_progress",
     },
 
     {
@@ -61,6 +62,7 @@ export const initialQuests = [
         ],
         reward: "50 XP",
         completed: false,
+        status: "in_progress",
     },
 
     {
