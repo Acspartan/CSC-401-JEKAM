@@ -9,70 +9,25 @@ import {
 
 // Starting quests
 export const initialQuests = [
-    {
-        id: 4,
-        title: "Getting to Know the Game",
-        description:
-            "Explore the campus by visiting three important buildings.",
-        objectives: [
-            {
-                id: "mackay",
-                text: "Walk to McKay Hall",
-                completed: false,
-            },
-            {
-                id: "morsani",
-                text: "Walk to Morsani Hall",
-                completed: false,
-            },
-            {
-                id: "jenkins",
-                text: "Walk to Jenkins Health and Technology Building",
-                completed: false,
-            },
-        ],
-        reward: "Level up once",
-        completed: false,
-        status: "in_progress",
-    },
-
-    {
-        id: 1,
-        title: "Explore Campus",
-        description: "Visit three important campus locations.",
-        objectives: [
-            "Visit Straz Hall",
-            "Visit Pepin Stadium",
-            "Visit Macdonald-Kelce Library",
-        ],
-        reward: "100 XP",
-        completed: false,
-        status: "in_progress",
-    },
-
-    {
-        id: 2,
-        title: "First Steps",
-        description: "Learn how to move around the campus.",
-        objectives: [
-            "Move north",
-            "Move south",
-            "Move east",
-            "Move west",
-        ],
-        reward: "50 XP",
-        completed: false,
-        status: "in_progress",
-    },
-
-    {
-        id: 3,
-        title: "Welcome to Campus",
-        description: "Begin your journey as a new student.",
-        objectives: ["Enter the campus"],
-        reward: "25 XP",
-        completed: true,
-    },
+  { id: 4, title: "Getting to Know the Game", description: "Explore the campus by visiting three important buildings.", objectives: [
+    { id: "mackay", text: "Walk to McKay Hall", completed: false },
+    { id: "morsani", text: "Walk to Morsani Hall", completed: false },
+    { id: "jenkins", text: "Walk to Jenkins Health and Technology Building", completed: false },
+  ], reward: "Level up once", completed: false, status: "in_progress" },
+  { id: 1, title: "Explore Campus", description: "Visit three important campus locations.", objectives: [
+    { id: "straz", text: "Visit Straz Hall", completed: false },
+    { id: "pepin", text: "Visit Pepin Stadium", completed: false },
+    { id: "library", text: "Visit Macdonald-Kelce Library", completed: false },
+  ], reward: "100 XP", completed: false, status: "in_progress" },
+  { id: 2, title: "First Steps", description: "Learn how to move around the campus.", objectives: [
+    { id: "north", text: "Move north", completed: false },
+    { id: "south", text: "Move south", completed: false },
+    { id: "east", text: "Move east", completed: false },
+    { id: "west", text: "Move west", completed: false },
+  ], reward: "50 XP", completed: false, status: "in_progress" },
+  { id: 3, title: "Welcome to Campus", description: "Begin your journey as a new student.", objectives: [
+    { id: "campus", text: "Enter the campus", completed: false },
+  ], reward: "25 XP", completed: false, status: "in_progress" },
 ];
 
 export default function QuestWindow({

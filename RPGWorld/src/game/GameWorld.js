@@ -36,12 +36,39 @@ const PLAYER_HEIGHT = 48;
 // Introductory quest ID
 const INTRO_QUEST_ID = 4;
 
-// Match actual campus building IDs to quest objective IDs
+// Resolve building IDs and names to quest objective IDs.
+// These aliases account for different naming conventions in campus data.
 const QUEST_BUILDINGS = {
   mckay: "mackay",
+  mackay: "mackay",
+  mckayhall: "mackay",
+  mackayhall: "mackay",
   morsani: "morsani",
-  TECH: "jenkins",
+  morsanihall: "morsani",
+  tech: "jenkins",
+  jenkins: "jenkins",
+  jenkinshealthandtechnologybuilding: "jenkins",
+  straz: "straz",
+  strazhall: "straz",
+  pepin: "pepin",
+  pepinstadium: "pepin",
+  library: "library",
+  macdonaldkelcelibrary: "library",
 };
+
+function resolveBuildingObjective(building) {
+  const candidates = [building.id, building.name, building.title, building.label];
+  for (const value of candidates) {
+    if (value == null) continue;
+    const normalized = String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (QUEST_BUILDINGS[normalized]) return QUEST_BUILDINGS[normalized];
+    if (normalized.includes("jenkins")) return "jenkins";
+    if (normalized.includes("macdonald") && normalized.includes("library")) return "library";
+    if (normalized.includes("pepin")) return "pepin";
+    if (normalized.includes("straz")) return "straz";
+  }
+  return null;
+}
 
 // Create initial quest state
 function createInitialQuests() {
@@ -100,6 +127,9 @@ export default function GameWorld() {
 
   // Track visited buildings to avoid repeated updates
   const visitedBuildings = useRef(new Set());
+
+  // Track movement between renders to complete directional objectives.
+  const previousPosition = useRef({ x: player.x, y: player.y });
 
   // Track whether introduction reward has been processed
   const introRewardProcessed = useRef(false);
@@ -163,56 +193,52 @@ export default function GameWorld() {
 
   }, []);
 
-  // Detect building visits when player position changes
+  // Update movement quests only after the player actually changes position.
   useEffect(() => {
+    const previous = previousPosition.current;
+    const completedActions = [];
 
+    if (player.x > previous.x) completedActions.push("east");
+    if (player.x < previous.x) completedActions.push("west");
+    if (player.y > previous.y) completedActions.push("south");
+    if (player.y < previous.y) completedActions.push("north");
+
+    previousPosition.current = { x: player.x, y: player.y };
+
+    if (completedActions.length > 0) {
+      // The player starts on the campus map; first movement confirms entry.
+      completedActions.push("campus");
+      setQuests((previousQuests) =>
+        completedActions.reduce(
+          (currentQuests, objectiveId) => updateQuestProgress(currentQuests, objectiveId),
+          previousQuests
+        )
+      );
+    }
+  }, [player.x, player.y]);
+
+  // Detect visits for both building-based quests.
+  useEffect(() => {
     const newlyVisited = [];
 
     buildings.forEach((building) => {
+      const objectiveId = resolveBuildingObjective(building);
+      if (!objectiveId || visitedBuildings.current.has(objectiveId)) return;
 
-      // Only track buildings used by the introduction quest
-      const objectiveId = QUEST_BUILDINGS[building.id];
-
-      if (!objectiveId) {
-        return;
-      }
-
-      // Check if player overlaps the building
-      const isInside = isPlayerAtBuilding(
-          player,
-          building
-      );
-
-      if (
-          isInside &&
-          !visitedBuildings.current.has(building.id)
-      ) {
-
-        visitedBuildings.current.add(building.id);
-
+      if (isPlayerAtBuilding(player, building)) {
+        visitedBuildings.current.add(objectiveId);
         newlyVisited.push(objectiveId);
       }
     });
 
-    if (newlyVisited.length === 0) {
-      return;
+    if (newlyVisited.length > 0) {
+      setQuests((previousQuests) =>
+        newlyVisited.reduce(
+          (currentQuests, objectiveId) => updateQuestProgress(currentQuests, objectiveId),
+          previousQuests
+        )
+      );
     }
-
-    // Update quest objectives
-    setQuests((previousQuests) => {
-
-      let updatedQuests = previousQuests;
-
-      newlyVisited.forEach((objectiveId) => {
-        updatedQuests = updateQuestProgress(
-            updatedQuests,
-            objectiveId
-        );
-      });
-
-      return updatedQuests;
-    });
-
   }, [player.x, player.y]);
 
   // Award one level when introduction quest is completed
