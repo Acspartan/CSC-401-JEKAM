@@ -134,6 +134,9 @@ export default function GameWorld() {
   // Track whether introduction reward has been processed
   const introRewardProcessed = useRef(false);
 
+  // Track XP rewards already granted so quest state changes cannot grant them twice.
+  const claimedXpRewards = useRef(new Set());
+
   // Move player using PlayableCharacter class
   const movePlayer = useCallback((direction) => {
 
@@ -243,6 +246,31 @@ export default function GameWorld() {
 
   // Award one level when introduction quest is completed
   useEffect(() => {
+
+    const newlyCompletedXpQuests = quests.filter((quest) => {
+      if (!quest.completed || claimedXpRewards.current.has(quest.id)) {
+        return false;
+      }
+
+      const xpReward = String(quest.reward).match(/(\d+)\s*XP/i);
+      if (!xpReward) return false;
+
+      claimedXpRewards.current.add(quest.id);
+      return true;
+    });
+
+    const xpToAward = newlyCompletedXpQuests.reduce((total, quest) => {
+      const xpReward = String(quest.reward).match(/(\d+)\s*XP/i);
+      return total + (xpReward ? Number(xpReward[1]) : 0);
+    }, 0);
+
+    if (xpToAward > 0) {
+      setPlayer((previous) => {
+        const updated = copyPlayer(previous);
+        updated.gainExperience(xpToAward);
+        return updated;
+      });
+    }
 
     const introQuest = quests.find(
         (quest) => String(quest.id) === String(INTRO_QUEST_ID)
