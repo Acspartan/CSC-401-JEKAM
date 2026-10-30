@@ -13,7 +13,7 @@ export const initialQuests = [
     { id: "mackay", text: "Walk to McKay Hall", completed: false },
     { id: "morsani", text: "Walk to Morsani Hall", completed: false },
     { id: "jenkins", text: "Walk to Jenkins Health and Technology Building", completed: false },
-  ], reward: "Level up once", completed: false, status: "in_progress" },
+  ], reward: "100 XP", completed: false, status: "in_progress" },
   { id: 1, title: "Explore Campus", description: "Visit three important campus locations.", objectives: [
     { id: "straz", text: "Visit Straz Hall", completed: false },
     { id: "pepin", text: "Visit Pepin Stadium", completed: false },

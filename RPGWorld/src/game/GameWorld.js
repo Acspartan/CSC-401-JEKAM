@@ -33,9 +33,6 @@ const WORLD_HEIGHT = 1250;
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
 
-// Introductory quest ID
-const INTRO_QUEST_ID = 4;
-
 // Resolve building IDs and names to quest objective IDs.
 // These aliases account for different naming conventions in campus data.
 const QUEST_BUILDINGS = {
@@ -97,10 +94,6 @@ function copyPlayer(previous, level = previous.level) {
   updated.experience = previous.experience;
   updated.speed = previous.speed;
 
-  // Preserve quest reward information
-  updated.introRewardClaimed =
-      previous.introRewardClaimed ?? false;
-
   return updated;
 }
 
@@ -130,9 +123,6 @@ export default function GameWorld() {
 
   // Track movement between renders to complete directional objectives.
   const previousPosition = useRef({ x: player.x, y: player.y });
-
-  // Track whether introduction reward has been processed
-  const introRewardProcessed = useRef(false);
 
   // Track XP rewards already granted so quest state changes cannot grant them twice.
   const claimedXpRewards = useRef(new Set());
@@ -244,7 +234,7 @@ export default function GameWorld() {
     }
   }, [player.x, player.y]);
 
-  // Award one level when introduction quest is completed
+  // Grant numeric XP quest rewards. Player.gainExperience applies the level formula.
   useEffect(() => {
 
     const newlyCompletedXpQuests = quests.filter((quest) => {
@@ -271,35 +261,6 @@ export default function GameWorld() {
         return updated;
       });
     }
-
-    const introQuest = quests.find(
-        (quest) => String(quest.id) === String(INTRO_QUEST_ID)
-    );
-
-    if (
-        !introQuest?.completed ||
-        introRewardProcessed.current
-    ) {
-      return;
-    }
-
-    introRewardProcessed.current = true;
-
-    setPlayer((previous) => {
-
-      if (previous.introRewardClaimed) {
-        return previous;
-      }
-
-      const updated = copyPlayer(
-          previous,
-          previous.level + 1
-      );
-
-      updated.introRewardClaimed = true;
-
-      return updated;
-    });
 
   }, [quests]);
 
