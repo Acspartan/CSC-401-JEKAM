@@ -6,6 +6,7 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
+import { experienceForLevel } from "../../models/player";
 
 // Starting quests
 export const initialQuests = [
@@ -88,6 +89,15 @@ export default function QuestWindow({
                     </Text>
                     <Text style={styles.experienceValue}>
                         {player?.experience ?? 0} XP
+                    </Text>
+                </View>
+
+                <View style={styles.statusRow}>
+                    <Text style={styles.statusLabel}>
+                        Next Level Up
+                    </Text>
+                    <Text style={styles.experienceValue}>
+                        {experienceForLevel((player?.level ?? 1) + 1)} XP
                     </Text>
                 </View>
 
