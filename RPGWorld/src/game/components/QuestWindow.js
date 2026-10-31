@@ -6,6 +6,7 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
+import { experienceForLevel } from "../../models/player";
 
 // Starting quests
 export const initialQuests = [
@@ -13,7 +14,7 @@ export const initialQuests = [
     { id: "mackay", text: "Walk to McKay Hall", completed: false },
     { id: "morsani", text: "Walk to Morsani Hall", completed: false },
     { id: "jenkins", text: "Walk to Jenkins Health and Technology Building", completed: false },
-  ], reward: "Level up once", completed: false, status: "in_progress" },
+  ], reward: "100 XP", completed: false, status: "in_progress" },
   { id: 1, title: "Explore Campus", description: "Visit three important campus locations.", objectives: [
     { id: "straz", text: "Visit Straz Hall", completed: false },
     { id: "pepin", text: "Visit Pepin Stadium", completed: false },
@@ -88,6 +89,15 @@ export default function QuestWindow({
                     </Text>
                     <Text style={styles.experienceValue}>
                         {player?.experience ?? 0} XP
+                    </Text>
+                </View>
+
+                <View style={styles.statusRow}>
+                    <Text style={styles.statusLabel}>
+                        Next Level Up
+                    </Text>
+                    <Text style={styles.experienceValue}>
+                        {experienceForLevel((player?.level ?? 1) + 1)} XP
                     </Text>
                 </View>
 
