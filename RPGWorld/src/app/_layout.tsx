@@ -26,6 +26,8 @@ export default function RootLayout() {
         <Stack.Screen name="explore" />
         <Stack.Screen name="login" />
         <Stack.Screen name="signup" />
+        <Stack.Screen name="welcome" />
+        <Stack.Screen name="main-menu" />
       </Stack>
     </ThemeProvider>
   );
