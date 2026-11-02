@@ -44,7 +44,7 @@ export default function Login() {
       }
 
       // TODO: Replace with your game's authenticated home screen.
-      router.replace("/");
+      router.replace("/main-menu");
     } catch {
       setMessage("Unable to connect. Please try again.");
     } finally {
@@ -91,6 +91,7 @@ export default function Login() {
         style={styles.button}
         onPress={handleLogin}
         disabled={loading}
+        
       >
         {loading ? (
           <ActivityIndicator color="white" />

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
@@ -68,12 +69,22 @@ export default function SignUp() {
 
       if (data.session) {
         setMessage("Account created! Taking you into the game...");
-        router.replace("/");
+        router.replace("/main-menu");
       } else {
         setMessage(
           "Account created! Check your email to confirm your account, then log in."
         );
       }
+
+      if (data.session) {
+        router.replace("/main-menu");
+      } else {
+        Alert.alert(
+          "Check Your Email",
+          "Please confirm your email before logging in."
+        );
+          router.replace("/login");
+        }
     } catch (error) {
       console.error("Supabase signup error:", error);
       setMessage(
