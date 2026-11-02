@@ -235,8 +235,8 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 1500,
-    y: 350
+    x: 1380,
+    y: 340
   },
 
   size: {
@@ -289,12 +289,12 @@ const buildings = [
   type: "services",
 
   position: {
-    x: 1464,
-    y: 120
+    x: 1250,
+    y: 320
   },
 
   size: {
-    width: 140,
+    width: 100,
     height: 100
   },
 },
@@ -307,8 +307,8 @@ const buildings = [
   type: "dorm",
 
   position: {
-    x: 716,
-    y: 124
+    x: 801,
+    y: 272
   },
 
   size: {
@@ -326,8 +326,8 @@ const buildings = [
   type: "athletic",
 
   position: {
-    x: 746,
-    y: 272
+    x: 780,
+    y: 420
   },
 
   size: {
@@ -466,8 +466,8 @@ const buildings = [
   type: "academic",
 
   position: {
-    x: 1026,
-    y: 450
+    x: 1005,
+    y: 415
   },
 
   size: {
@@ -496,7 +496,31 @@ const buildings = [
   },
 
   image: "morsani",
+},
+
+{
+  id: "map",
+
+  name: "Map",
+
+  type: "map",
+
+  position: {
+    x: 30,
+    y: -60
+  },
+
+  size: {
+    width: 1920,
+    height: 1290
+  },
+
+  
+
+  image: "fullMap",
 }
+
+
 
 
 

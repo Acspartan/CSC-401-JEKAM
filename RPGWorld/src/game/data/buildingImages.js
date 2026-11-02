@@ -31,6 +31,8 @@ const buildingImages = {
   jenkinsHealthTech: require("../assets/buildings/jenkinsHealthTech.png"),
   // image for straz building
   straz: require("../assets/buildings/Straz.png"),
+  // image for full map
+  fullMap: require("../assets/buildings/fullMap.png"),
 };
 
 export default buildingImages;
