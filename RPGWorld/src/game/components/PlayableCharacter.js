@@ -1,6 +1,6 @@
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 
 export default function PlayableCharacter({ x, y }) {
     return (
@@ -14,7 +14,11 @@ export default function PlayableCharacter({ x, y }) {
                 },
             ]}
         >
-            <Text style={styles.avatar}>🧍</Text>
+           <Image
+                source={require("../assets/player/piratewalk.gif")}
+                style={styles.avatar}
+                resizeMode="contain"
+/>
         </View>
     );
 }
@@ -30,6 +34,7 @@ const styles = StyleSheet.create({
     },
 
     avatar: {
-        fontSize: 32,
+        width: 40,
+        height: 48,
     },
 });
