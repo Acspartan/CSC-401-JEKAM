@@ -12,6 +12,7 @@ import {
 //code from: https://codeworkshop.dev/doc/2020-03-01-creating-an-rpg-dialog-effect-with-react-and-react-spring
 import DialogBox from "./components/DialogBox";
 
+
 // Just hard coding these for now to demonstrate our DialogBox component.
 const messages = [
   "This is a very cool RPG dialog message.",
@@ -48,7 +49,8 @@ const PLAYER_HEIGHT = 48;
 const SCENES = {
   prologue_p1: {
     type: "image",
-    image: require("../game/assets/backgrounds/prologue1.png"),
+    image: require("./assets/backgrounds/prologue1.png"),
+    portrait: require("./assets/portraits/jeangourd.png"),
     dialogue: [
       "Welcome to the University of Tampa!",
       "You are a new student here, and your goal is to explore the campus and complete quests.",
@@ -411,6 +413,12 @@ export default function GameWorld() {
               />
             </View>
 
+            <View style={styles.portaitContainer}>
+              <portrait
+                portrait={portrait}
+              />
+            </View>
+
             {/* DIRECTIONAL CONTROLS */}
             <View style={styles.controls}>
               <Pressable
@@ -479,15 +487,24 @@ const styles = StyleSheet.create({
   },
 
   sceneImage: {
-    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
 
   sceneDialogPanel: {
     position: "absolute",
-    left: 20,
     right: 20,
     bottom: 20,
+    width: '75%',
     zIndex: 2000,
+    elevation: 11,
+  },
+
+  portaitContainer: {
+    position: "absolute",
+    left: 20,
+    bottom: 20,
+    width: '25%',
     elevation: 11,
   },
 
