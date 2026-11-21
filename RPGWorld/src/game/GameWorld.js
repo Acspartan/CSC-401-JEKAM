@@ -6,7 +6,18 @@ import {
   StyleSheet,
   Text,
   Pressable,
+  Image,
 } from "react-native";
+
+//code from: https://codeworkshop.dev/doc/2020-03-01-creating-an-rpg-dialog-effect-with-react-and-react-spring
+import DialogBox from "./components/DialogBox";
+
+// Just hard coding these for now to demonstrate our DialogBox component.
+const messages = [
+  "This is a very cool RPG dialog message.",
+  "If you would like to see more awesome stuff, check out the other writeups at codeworkshop.dev!",
+  "Remember to wash your hands!",
+];
 
 // Campus buildings
 import buildings from "./data/buildings";
@@ -32,6 +43,22 @@ const WORLD_HEIGHT = 1250;
 // Player dimensions
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
+
+// SCENES Constants 
+const SCENES = {
+  prologue_p1: {
+    type: "image",
+    image: require("../game/assets/backgrounds/prologue1.png"),
+    dialogue: [
+      "Welcome to the University of Tampa!",
+      "You are a new student here, and your goal is to explore the campus and complete quests.",
+    ],
+    nextScene: "campus"
+  },
+  campus: {
+    type: "game",
+  },
+};
 
 // Resolve building IDs and names to quest objective IDs.
 // These aliases account for different naming conventions in campus data.
@@ -98,6 +125,13 @@ function copyPlayer(previous, level = previous.level) {
 }
 
 export default function GameWorld() {
+  const [activeScene, setActiveScene] = useState("prologue_p1");
+
+  const goToNextScene = useCallback(() => {
+    setActiveScene((currentScene) =>
+      SCENES[currentScene]?.nextScene ?? currentScene
+    );
+  }, []);
 
   // Create player from inherited class
   const [player, setPlayer] = useState(() =>
@@ -323,119 +357,112 @@ export default function GameWorld() {
 
   return (
       <View style={styles.container}>
+        {SCENES[activeScene].type === "image" ? (
+          <View style={styles.sceneContainer}>
+            <Image
+              source={SCENES[activeScene].image}
+              style={styles.sceneImage}
+              resizeMode="cover"
+            />
 
-        {/* CAMPUS MAP */}
-        {/* Scroll added to accommodate different screen sizes */}
-        <ScrollView
-            style={styles.screen}
-            contentContainerStyle={{
-              height: WORLD_HEIGHT,
-            }}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-        >
-
-          <ScrollView
-              horizontal
-              contentContainerStyle={{
-                width: WORLD_WIDTH,
-              }}
-              showsHorizontalScrollIndicator={false}
-              bounces={false}
-          >
-
-            <View style={styles.gameWorld}>
-
-              {/* Existing campus buildings */}
-              {buildings.map((building) => (
-                  <Building
-                      key={building.id}
-                      building={building}
-                  />
-              ))}
-
-              {/* Playable character */}
-              <PlayableCharacterView
-                  x={player.x}
-                  y={player.y}
+            <View style={styles.sceneDialogPanel}>
+              <DialogBox
+                key={activeScene}
+                messages={SCENES[activeScene].dialogue}
+                onComplete={goToNextScene}
               />
-
             </View>
-
-          </ScrollView>
-
-        </ScrollView>
-
-        {/* DIRECTIONAL CONTROLS */}
-        <View style={styles.controls}>
-
-          {/* Up */}
-          <Pressable
-              style={styles.button}
-              onPress={() => movePlayer("up")}
-          >
-            <Text style={styles.buttonText}>
-              ↑
-            </Text>
-          </Pressable>
-
-          <View style={styles.horizontalControls}>
-
-            {/* Left */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("left")}
-            >
-              <Text style={styles.buttonText}>
-                ←
-              </Text>
-            </Pressable>
-
-            {/* Down */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("down")}
-            >
-              <Text style={styles.buttonText}>
-                ↓
-              </Text>
-            </Pressable>
-
-            {/* Right */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("right")}
-            >
-              <Text style={styles.buttonText}>
-                →
-              </Text>
-            </Pressable>
-
           </View>
+        ) : (
+          <>
+            {/* CAMPUS MAP */}
+            <ScrollView
+                style={styles.screen}
+                contentContainerStyle={{ height: WORLD_HEIGHT }}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+            >
+              <ScrollView
+                  horizontal
+                  contentContainerStyle={{ width: WORLD_WIDTH }}
+                  showsHorizontalScrollIndicator={false}
+                  bounces={false}
+              >
+                <View style={styles.gameWorld}>
+                  {buildings.map((building) => (
+                      <Building
+                          key={building.id}
+                          building={building}
+                      />
+                  ))}
 
-        </View>
+                  <PlayableCharacterView
+                      x={player.x}
+                      y={player.y}
+                  />
+                </View>
+              </ScrollView>
+            </ScrollView>
 
-        {/* QUEST WINDOW */}
-        {questOpen && (
-            <View style={styles.questPanel}>
-              <QuestWindow
-                  player={player}
-                  quests={quests}
+            <View style={styles.dialogPanel}>
+              <DialogBox
+                key="campus-dialog"
+                messages={messages}
               />
             </View>
-        )}
 
-        {/* BOTTOM-LEFT QUEST BUTTON */}
-        <Pressable
-            style={styles.questButton}
-            onPress={() =>
-                setQuestOpen((previous) => !previous)
-            }
-        >
-          <Text style={styles.questButtonText}>
-            {questOpen ? "Close Quests" : "Quests"}
-          </Text>
-        </Pressable>
+            {/* DIRECTIONAL CONTROLS */}
+            <View style={styles.controls}>
+              <Pressable
+                  style={styles.button}
+                  onPress={() => movePlayer("up")}
+              >
+                <Text style={styles.buttonText}>↑</Text>
+              </Pressable>
+
+              <View style={styles.horizontalControls}>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("left")}
+                >
+                  <Text style={styles.buttonText}>←</Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("down")}
+                >
+                  <Text style={styles.buttonText}>↓</Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("right")}
+                >
+                  <Text style={styles.buttonText}>→</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {questOpen && (
+                <View style={styles.questPanel}>
+                  <QuestWindow
+                      player={player}
+                      quests={quests}
+                  />
+                </View>
+            )}
+
+            <Pressable
+                style={styles.questButton}
+                onPress={() => setQuestOpen((previous) => !previous)}
+            >
+              <Text style={styles.questButtonText}>
+                {questOpen ? "Close Quests" : "Quests"}
+              </Text>
+            </Pressable>
+          </>
+        )}
 
       </View>
   );
@@ -445,6 +472,23 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+  },
+
+  sceneContainer: {
+    flex: 1,
+  },
+
+  sceneImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  sceneDialogPanel: {
+    position: "absolute",
+    left: 20,
+    right: 20,
+    bottom: 20,
+    zIndex: 2000,
+    elevation: 11,
   },
 
   screen: {
@@ -488,6 +532,15 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+
+  dialogPanel: {
+    position: "absolute",
+    top: 800,
+    right: 20,
+    width: 320,
+    zIndex: 2000,
+    elevation: 11,
   },
 
   // Directional controls
