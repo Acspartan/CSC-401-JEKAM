@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const DialogBox = ({ messages = [], speaker = "Cameron", onComplete }) => {
+const DialogBox = ({ messages = [], speaker = "Dr. Gourd", onComplete }) => {
   const [currentMessage, setCurrentMessage] = useState(0);
 
   if (messages.length === 0) {

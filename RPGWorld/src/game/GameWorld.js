@@ -367,6 +367,16 @@ export default function GameWorld() {
               resizeMode="cover"
             />
 
+            {SCENES[activeScene].portrait && (
+              <View style={styles.portraitContainer}>
+                <Image
+                  source={SCENES[activeScene].portrait}
+                  style={styles.portraitImage}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+
             <View style={styles.sceneDialogPanel}>
               <DialogBox
                 key={activeScene}
@@ -410,12 +420,6 @@ export default function GameWorld() {
               <DialogBox
                 key="campus-dialog"
                 messages={messages}
-              />
-            </View>
-
-            <View style={styles.portaitContainer}>
-              <portrait
-                portrait={portrait}
               />
             </View>
 
@@ -500,12 +504,19 @@ const styles = StyleSheet.create({
     elevation: 11,
   },
 
-  portaitContainer: {
+  portraitContainer: {
     position: "absolute",
     left: 20,
     bottom: 20,
-    width: '25%',
+    width: "25%",
+    height: 220,
+    zIndex: 2000,
     elevation: 11,
+  },
+
+  portraitImage: {
+    width: "100%",
+    height: "100%",
   },
 
   screen: {
