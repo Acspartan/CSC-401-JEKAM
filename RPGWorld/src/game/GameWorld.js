@@ -6,7 +6,19 @@ import {
   StyleSheet,
   Text,
   Pressable,
+  Image,
 } from "react-native";
+
+//code from: https://codeworkshop.dev/doc/2020-03-01-creating-an-rpg-dialog-effect-with-react-and-react-spring
+import DialogBox from "./components/DialogBox";
+
+
+// Just hard coding these for now to demonstrate our DialogBox component.
+const messages = [
+  "This is a very cool RPG dialog message.",
+  "If you would like to see more awesome stuff, check out the other writeups at codeworkshop.dev!",
+  "Remember to wash your hands!",
+];
 
 // Campus buildings
 import buildings from "./data/buildings";
@@ -32,6 +44,47 @@ const WORLD_HEIGHT = 1250;
 // Player dimensions
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
+
+// SCENES Constants 
+const SCENES = {
+  prologue_p1: {
+    type: "image",
+    image: require("./assets/backgrounds/prologue1.png"),
+    portrait: require("./assets/portraits/guide_port.png"),
+    dialogue: [
+      "Ahoy matey! I’m Edith I’ll be your mentor on this journey! Are you ready to become the greatest pirate to ever be and set sail on this journey away from home?", 
+      "That’s a fine name indeed… I’ll tell you what [name], fill out this archive here and I’ll give you your first task.",
+      // prompt user to fill out profile {major, minor, advisor, classes and their buildings, dorm building.} 
+      "We still have a bit longer till we reach land ho. Tell me a little more about yourself. As we both know your studies are important, but there is more to life than your books! What do you like doing in your free time?",
+      // prompt user to fill out profile p2 {fitness level, social prefrences, time management skills, ect...}
+      "OHO! Very interesting… I’ll keep this all in mind as I guide you through the rough waters of your first semester here. ",
+      "Look ahead! LAND HO!!! PREPARE TO DOCK! ",
+      "What a lovely place…oh I forgot to mention… as you complete the tasks I give you, I’ll give you a small reward for your trouble, feel free to trade them later for any cosmetics you like.",
+      "Here, I’ll give you your first task now… open the map and visit each of the buildings your class is in, even if you’ve been before it will be good for you to remember them!",
+      // once tasks completed 
+      "Good Work! Knowing where your classes are will help you to stay on top of your studies here! As promised, here's a small reward you can use later.",
+
+
+    ],
+    nextScene: "campus"
+  },
+  campus: {
+    type: "game",
+  },
+};
+
+const SCENE_CHOICES = [
+  {
+    id: "excited",
+    label: "Yes! I am excited",
+    response: "Great! The sea is vast and wide with so much to do. Let's get you started out, first tell me your name…",
+  },
+  {
+    id: "nervous",
+    label: "I'm nervous…",
+    response: "That’s okay we’ll guide our sails to some resources close to home that can help ease your mind, but first tell me, what’s your name, matey?",
+  },
+];
 
 // Resolve building IDs and names to quest objective IDs.
 // These aliases account for different naming conventions in campus data.
@@ -98,6 +151,28 @@ function copyPlayer(previous, level = previous.level) {
 }
 
 export default function GameWorld() {
+  const [activeScene, setActiveScene] = useState("prologue_p1");
+  const [showSceneChoices, setShowSceneChoices] = useState(false);
+  const [selectedSceneChoice, setSelectedSceneChoice] = useState(null);
+  const selectedChoice = SCENE_CHOICES.find(
+    (choice) => choice.id === selectedSceneChoice
+  );
+
+  const chooseSceneOption = (choiceId) => {
+    setSelectedSceneChoice(choiceId);
+    setShowSceneChoices(false);
+  };
+
+  const goToNextScene = useCallback(() => {
+    setActiveScene((currentScene) => {
+      if (currentScene === "prologue_p1" && !selectedSceneChoice) {
+        setShowSceneChoices(true);
+        return currentScene;
+      }
+
+      return SCENES[currentScene]?.nextScene ?? currentScene;
+    });
+  }, [selectedSceneChoice]);
 
   // Create player from inherited class
   const [player, setPlayer] = useState(() =>
@@ -323,119 +398,150 @@ export default function GameWorld() {
 
   return (
       <View style={styles.container}>
+        {SCENES[activeScene].type === "image" ? (
+          <View style={styles.sceneContainer}>
+            <Image
+              source={SCENES[activeScene].image}
+              style={styles.sceneImage}
+              resizeMode="cover"
+            />
 
-        {/* CAMPUS MAP */}
-        {/* Scroll added to accommodate different screen sizes */}
-        <ScrollView
-            style={styles.screen}
-            contentContainerStyle={{
-              height: WORLD_HEIGHT,
-            }}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-        >
+            {SCENES[activeScene].portrait && (
+              <View style={styles.portraitContainer}>
+                <Image
+                  source={SCENES[activeScene].portrait}
+                  style={styles.portraitImage}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
 
-          <ScrollView
-              horizontal
-              contentContainerStyle={{
-                width: WORLD_WIDTH,
-              }}
-              showsHorizontalScrollIndicator={false}
-              bounces={false}
-          >
-
-            <View style={styles.gameWorld}>
-
-              {/* Existing campus buildings */}
-              {buildings.map((building) => (
-                  <Building
-                      key={building.id}
-                      building={building}
-                  />
-              ))}
-
-              {/* Playable character */}
-              <PlayableCharacterView
-                  x={player.x}
-                  y={player.y}
+            <View style={styles.sceneDialogPanel}>
+              <DialogBox
+                key={`${activeScene}-${selectedSceneChoice ?? "none"}`}
+                messages={
+                  activeScene === "prologue_p1"
+                    ? selectedChoice
+                      ? [
+                          SCENES[activeScene].dialogue[0],
+                          selectedChoice.response,
+                          ...SCENES[activeScene].dialogue.slice(1),
+                        ]
+                      : SCENES[activeScene].dialogue.slice(0, 1)
+                    : SCENES[activeScene].dialogue
+                }
+                initialMessageIndex={
+                  activeScene === "prologue_p1" && selectedChoice
+                    ? 1
+                    : 0
+                }
+                onComplete={goToNextScene}
               />
-
+              {showSceneChoices && (
+                <View style={styles.sceneChoices}>
+                  {SCENE_CHOICES.map((choice) => (
+                    <Pressable
+                      key={choice.id}
+                      style={styles.choiceButton}
+                      onPress={() => chooseSceneOption(choice.id)}
+                    >
+                      <Text style={styles.choiceText}>{choice.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
-
-          </ScrollView>
-
-        </ScrollView>
-
-        {/* DIRECTIONAL CONTROLS */}
-        <View style={styles.controls}>
-
-          {/* Up */}
-          <Pressable
-              style={styles.button}
-              onPress={() => movePlayer("up")}
-          >
-            <Text style={styles.buttonText}>
-              ↑
-            </Text>
-          </Pressable>
-
-          <View style={styles.horizontalControls}>
-
-            {/* Left */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("left")}
-            >
-              <Text style={styles.buttonText}>
-                ←
-              </Text>
-            </Pressable>
-
-            {/* Down */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("down")}
-            >
-              <Text style={styles.buttonText}>
-                ↓
-              </Text>
-            </Pressable>
-
-            {/* Right */}
-            <Pressable
-                style={styles.button}
-                onPress={() => movePlayer("right")}
-            >
-              <Text style={styles.buttonText}>
-                →
-              </Text>
-            </Pressable>
-
           </View>
+        ) : (
+          <>
+            {/* CAMPUS MAP */}
+            <ScrollView
+                style={styles.screen}
+                contentContainerStyle={{ height: WORLD_HEIGHT }}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+            >
+              <ScrollView
+                  horizontal
+                  contentContainerStyle={{ width: WORLD_WIDTH }}
+                  showsHorizontalScrollIndicator={false}
+                  bounces={false}
+              >
+                <View style={styles.gameWorld}>
+                  {buildings.map((building) => (
+                      <Building
+                          key={building.id}
+                          building={building}
+                      />
+                  ))}
 
-        </View>
+                  <PlayableCharacterView
+                      x={player.x}
+                      y={player.y}
+                  />
+                </View>
+              </ScrollView>
+            </ScrollView>
 
-        {/* QUEST WINDOW */}
-        {questOpen && (
-            <View style={styles.questPanel}>
-              <QuestWindow
-                  player={player}
-                  quests={quests}
+            <View style={styles.dialogPanel}>
+              <DialogBox
+                key="campus-dialog"
+                messages={messages}
               />
             </View>
-        )}
 
-        {/* BOTTOM-LEFT QUEST BUTTON */}
-        <Pressable
-            style={styles.questButton}
-            onPress={() =>
-                setQuestOpen((previous) => !previous)
-            }
-        >
-          <Text style={styles.questButtonText}>
-            {questOpen ? "Close Quests" : "Quests"}
-          </Text>
-        </Pressable>
+            {/* DIRECTIONAL CONTROLS */}
+            <View style={styles.controls}>
+              <Pressable
+                  style={styles.button}
+                  onPress={() => movePlayer("up")}
+              >
+                <Text style={styles.buttonText}>↑</Text>
+              </Pressable>
+
+              <View style={styles.horizontalControls}>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("left")}
+                >
+                  <Text style={styles.buttonText}>←</Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("down")}
+                >
+                  <Text style={styles.buttonText}>↓</Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.button}
+                    onPress={() => movePlayer("right")}
+                >
+                  <Text style={styles.buttonText}>→</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {questOpen && (
+                <View style={styles.questPanel}>
+                  <QuestWindow
+                      player={player}
+                      quests={quests}
+                  />
+                </View>
+            )}
+
+            <Pressable
+                style={styles.questButton}
+                onPress={() => setQuestOpen((previous) => !previous)}
+            >
+              <Text style={styles.questButtonText}>
+                {questOpen ? "Close Quests" : "Quests"}
+              </Text>
+            </Pressable>
+          </>
+        )}
 
       </View>
   );
@@ -445,6 +551,58 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+  },
+
+  sceneContainer: {
+    flex: 1,
+  },
+
+  sceneImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  sceneDialogPanel: {
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+    width: '75%',
+    zIndex: 2000,
+    elevation: 11,
+  },
+
+  sceneChoices: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 8,
+  },
+
+  choiceButton: {
+    flex: 1,
+    backgroundColor: "#25384d",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+  },
+
+  choiceText: {
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+
+  portraitContainer: {
+    position: "absolute",
+    left: 20,
+    bottom: 20,
+    width: "25%",
+    height: 220,
+    zIndex: 2000,
+    elevation: 11,
+  },
+
+  portraitImage: {
+    width: "100%",
+    height: "100%",
   },
 
   screen: {
@@ -488,6 +646,15 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+
+  dialogPanel: {
+    position: "absolute",
+    top: 800,
+    right: 20,
+    width: 320,
+    zIndex: 2000,
+    elevation: 11,
   },
 
   // Directional controls
