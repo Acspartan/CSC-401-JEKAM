@@ -53,8 +53,17 @@ const SCENES = {
     portrait: require("./assets/portraits/guide_port.png"),
     dialogue: [
       "Ahoy matey! I’m Edith I’ll be your mentor on this journey! Are you ready to become the greatest pirate to ever be and set sail on this journey away from home?", 
-      "You are a new student here, and your goal is to explore the campus and complete quests.",
-      "Choose how you feel about beginning this journey:",
+      "That’s a fine name indeed… I’ll tell you what [name], fill out this archive here and I’ll give you your first task.",
+      // prompt user to fill out profile {major, minor, advisor, classes and their buildings, dorm building.} 
+      "We still have a bit longer till we reach land ho. Tell me a little more about yourself. As we both know your studies are important, but there is more to life than your books! What do you like doing in your free time?",
+      // prompt user to fill out profile p2 {fitness level, social prefrences, time management skills, ect...}
+      "OHO! Very interesting… I’ll keep this all in mind as I guide you through the rough waters of your first semester here. ",
+      "Look ahead! LAND HO!!! PREPARE TO DOCK! ",
+      "What a lovely place…oh I forgot to mention… as you complete the tasks I give you, I’ll give you a small reward for your trouble, feel free to trade them later for any cosmetics you like.",
+      "Here, I’ll give you your first task now… open the map and visit each of the buildings your class is in, even if you’ve been before it will be good for you to remember them!",
+      // once tasks completed 
+      "Good Work! Knowing where your classes are will help you to stay on top of your studies here! As promised, here's a small reward you can use later.",
+
 
     ],
     nextScene: "campus"
@@ -411,13 +420,19 @@ export default function GameWorld() {
               <DialogBox
                 key={`${activeScene}-${selectedSceneChoice ?? "none"}`}
                 messages={
-                  activeScene === "prologue_p1" && selectedChoice
-                    ? [...SCENES[activeScene].dialogue, selectedChoice.response]
+                  activeScene === "prologue_p1"
+                    ? selectedChoice
+                      ? [
+                          SCENES[activeScene].dialogue[0],
+                          selectedChoice.response,
+                          ...SCENES[activeScene].dialogue.slice(1),
+                        ]
+                      : SCENES[activeScene].dialogue.slice(0, 1)
                     : SCENES[activeScene].dialogue
                 }
                 initialMessageIndex={
                   activeScene === "prologue_p1" && selectedChoice
-                    ? SCENES[activeScene].dialogue.length
+                    ? 1
                     : 0
                 }
                 onComplete={goToNextScene}
