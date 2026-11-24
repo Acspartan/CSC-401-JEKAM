@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const DialogBox = ({ messages = [], speaker = "Dr. Gourd", onComplete }) => {
-  const [currentMessage, setCurrentMessage] = useState(0);
+const DialogBox = ({
+  messages = [],
+  speaker = "Edith",
+  onComplete,
+  initialMessageIndex = 0,
+}) => {
+  const [currentMessage, setCurrentMessage] = useState(initialMessageIndex);
 
   if (messages.length === 0) {
     return null;

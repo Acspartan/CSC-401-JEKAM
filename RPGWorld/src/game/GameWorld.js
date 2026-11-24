@@ -50,10 +50,12 @@ const SCENES = {
   prologue_p1: {
     type: "image",
     image: require("./assets/backgrounds/prologue1.png"),
-    portrait: require("./assets/portraits/jeangourd.png"),
+    portrait: require("./assets/portraits/guide_port.png"),
     dialogue: [
-      "Welcome to the University of Tampa!",
+      "Ahoy matey! I’m Edith I’ll be your mentor on this journey! Are you ready to become the greatest pirate to ever be and set sail on this journey away from home?", 
       "You are a new student here, and your goal is to explore the campus and complete quests.",
+      "Choose how you feel about beginning this journey:",
+
     ],
     nextScene: "campus"
   },
@@ -61,6 +63,19 @@ const SCENES = {
     type: "game",
   },
 };
+
+const SCENE_CHOICES = [
+  {
+    id: "excited",
+    label: "Yes! I am excited",
+    response: "Great! The sea is vast and wide with so much to do. Let's get you started out, first tell me your name…",
+  },
+  {
+    id: "nervous",
+    label: "I'm nervous…",
+    response: "That’s okay we’ll guide our sails to some resources close to home that can help ease your mind, but first tell me, what’s your name, matey?",
+  },
+];
 
 // Resolve building IDs and names to quest objective IDs.
 // These aliases account for different naming conventions in campus data.
@@ -128,12 +143,27 @@ function copyPlayer(previous, level = previous.level) {
 
 export default function GameWorld() {
   const [activeScene, setActiveScene] = useState("prologue_p1");
+  const [showSceneChoices, setShowSceneChoices] = useState(false);
+  const [selectedSceneChoice, setSelectedSceneChoice] = useState(null);
+  const selectedChoice = SCENE_CHOICES.find(
+    (choice) => choice.id === selectedSceneChoice
+  );
+
+  const chooseSceneOption = (choiceId) => {
+    setSelectedSceneChoice(choiceId);
+    setShowSceneChoices(false);
+  };
 
   const goToNextScene = useCallback(() => {
-    setActiveScene((currentScene) =>
-      SCENES[currentScene]?.nextScene ?? currentScene
-    );
-  }, []);
+    setActiveScene((currentScene) => {
+      if (currentScene === "prologue_p1" && !selectedSceneChoice) {
+        setShowSceneChoices(true);
+        return currentScene;
+      }
+
+      return SCENES[currentScene]?.nextScene ?? currentScene;
+    });
+  }, [selectedSceneChoice]);
 
   // Create player from inherited class
   const [player, setPlayer] = useState(() =>
@@ -379,10 +409,32 @@ export default function GameWorld() {
 
             <View style={styles.sceneDialogPanel}>
               <DialogBox
-                key={activeScene}
-                messages={SCENES[activeScene].dialogue}
+                key={`${activeScene}-${selectedSceneChoice ?? "none"}`}
+                messages={
+                  activeScene === "prologue_p1" && selectedChoice
+                    ? [...SCENES[activeScene].dialogue, selectedChoice.response]
+                    : SCENES[activeScene].dialogue
+                }
+                initialMessageIndex={
+                  activeScene === "prologue_p1" && selectedChoice
+                    ? SCENES[activeScene].dialogue.length
+                    : 0
+                }
                 onComplete={goToNextScene}
               />
+              {showSceneChoices && (
+                <View style={styles.sceneChoices}>
+                  {SCENE_CHOICES.map((choice) => (
+                    <Pressable
+                      key={choice.id}
+                      style={styles.choiceButton}
+                      onPress={() => chooseSceneOption(choice.id)}
+                    >
+                      <Text style={styles.choiceText}>{choice.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
         ) : (
@@ -502,6 +554,25 @@ const styles = StyleSheet.create({
     width: '75%',
     zIndex: 2000,
     elevation: 11,
+  },
+
+  sceneChoices: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 8,
+  },
+
+  choiceButton: {
+    flex: 1,
+    backgroundColor: "#25384d",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+  },
+
+  choiceText: {
+    color: "#FFFFFF",
+    textAlign: "center",
   },
 
   portraitContainer: {
