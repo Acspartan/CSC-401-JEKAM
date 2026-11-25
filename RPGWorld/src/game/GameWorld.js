@@ -27,6 +27,7 @@ import buildings from "./data/buildings";
 import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
 import QuestWindow, { initialQuests } from "./components/QuestWindow";
+import StoryQuest from "./components/StoryQuest";
 
 // Game systems
 import { isPlayerAtBuilding } from "./systems/buildingCollision";
@@ -523,6 +524,10 @@ export default function GameWorld() {
               </View>
             </View>
 
+            {/* STORY DIALOGUE */}
+            <StoryQuest quests={quests} />
+
+            {/* QUEST WINDOW */}
             {questOpen && (
                 <View style={styles.questPanel}>
                   <QuestWindow
