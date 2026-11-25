@@ -16,8 +16,8 @@ import DialogBox from "./components/DialogBox";
 // Just hard coding these for now to demonstrate our DialogBox component.
 const messages = [
   "This is a very cool RPG dialog message.",
-  "If you would like to see more awesome stuff, check out the other writeups at codeworkshop.dev!",
-  "Remember to wash your hands!",
+ // "If you would like to see more awesome stuff, check out the other writeups at codeworkshop.dev!",
+ // "Remember to wash your hands!",
 ];
 
 // Campus buildings
@@ -66,7 +66,20 @@ const SCENES = {
 
 
     ],
-    nextScene: "campus"
+    nextScene: "PlantHall"
+  },
+  campus: {
+    type: "game",
+  },
+
+  PlantHall: {
+    type: "image",
+    image: require("./assets/backgrounds/plantHallScene.png"),
+    portrait: require("./assets/portraits/guide_port.png"),
+    dialogue: [
+      "Ah! We've landed on the history shores of Plant Hall! Back in my day this place used to be a hotel hosting over 500 rooms for travelers like me! Nowadays it's a hub for classrooms and offices",
+    ],
+    nextScene: "PlantHall"
   },
   campus: {
     type: "game",
