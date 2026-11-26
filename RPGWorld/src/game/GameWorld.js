@@ -11,6 +11,7 @@ import {
 
 //code from: https://codeworkshop.dev/doc/2020-03-01-creating-an-rpg-dialog-effect-with-react-and-react-spring
 import DialogBox from "./components/DialogBox";
+import { supabase } from "../../lib/supabase";
 
 
 // Just hard coding these for now to demonstrate our DialogBox component.
@@ -167,6 +168,7 @@ export default function GameWorld() {
   const [activeScene, setActiveScene] = useState("prologue_p1");
   const [showSceneChoices, setShowSceneChoices] = useState(false);
   const [selectedSceneChoice, setSelectedSceneChoice] = useState(null);
+  const [playerName, setPlayerName] = useState("");
   const selectedChoice = SCENE_CHOICES.find(
     (choice) => choice.id === selectedSceneChoice
   );
@@ -438,7 +440,9 @@ export default function GameWorld() {
                       ? [
                           SCENES[activeScene].dialogue[0],
                           selectedChoice.response,
-                          ...SCENES[activeScene].dialogue.slice(1),
+                          ...SCENES[activeScene].dialogue.slice(1).map((message) =>
+                            message.replace("[name]", player.name)
+                          ),
                         ]
                       : SCENES[activeScene].dialogue.slice(0, 1)
                     : SCENES[activeScene].dialogue
@@ -448,6 +452,35 @@ export default function GameWorld() {
                     ? 1
                     : 0
                 }
+                namePrompt={activeScene === "prologue_p1" && Boolean(selectedChoice)}
+                name={playerName}
+                onNameChange={setPlayerName}
+                onNameSubmit={async (name) => {
+                  const { data: { user }, error: userError } =
+                    await supabase.auth.getUser();
+                  if (userError) throw userError;
+                  if (!user) {
+                    throw new Error("Please log in before saving your name.");
+                  }
+
+                  const { data: profile, error: profileError } = await supabase
+                    .from("profiles")
+                    .update({ Name: name })
+                    .eq("id", user.id)
+                    .select("id")
+                    .maybeSingle();
+
+                  if (profileError) throw profileError;
+                  if (!profile) {
+                    throw new Error("Your profile could not be found.");
+                  }
+
+                  setPlayer((previous) => {
+                    const updated = copyPlayer(previous);
+                    updated.name = name;
+                    return updated;
+                  });
+                }}
                 onComplete={goToNextScene}
               />
               {showSceneChoices && (
