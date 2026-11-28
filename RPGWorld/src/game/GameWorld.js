@@ -27,6 +27,7 @@ import buildings from "./data/buildings";
 // Game components
 import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
+import MiniMap from "./components/MiniMap";
 import QuestWindow, { initialQuests } from "./components/QuestWindow";
 
 // Game systems
@@ -80,7 +81,7 @@ const SCENES = {
     dialogue: [
       "Ah! We've landed on the history shores of Plant Hall! Back in my day this place used to be a hotel hosting over 500 rooms for travelers like me! Nowadays it's a hub for classrooms and offices",
     ],
-    nextScene: "PlantHall"
+    nextScene: "campus"
   },
   campus: {
     type: "game",
@@ -525,9 +526,15 @@ export default function GameWorld() {
                       x={player.x}
                       y={player.y}
                   />
+
+              
                 </View>
               </ScrollView>
             </ScrollView>
+
+
+        
+        
 
             <View style={styles.dialogPanel}>
               <DialogBox
@@ -589,6 +596,9 @@ export default function GameWorld() {
           </>
         )}
 
+        <View pointerEvents="box-none" style={styles.miniMapOverlay}>
+          <MiniMap />
+        </View>
       </View>
   );
 }
@@ -597,6 +607,15 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+  },
+
+  miniMapOverlay: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    width: 180,
+    height: 100,
+    zIndex: 3000,
   },
 
   sceneContainer: {
