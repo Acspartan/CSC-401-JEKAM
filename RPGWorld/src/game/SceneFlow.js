@@ -160,6 +160,38 @@ export function SceneScreen({
   );
 }
 
+
+
+export function displayMiniMap() {
+  return (
+    <View style={styles.container}>
+      <Image 
+        source={require('./assets/buildings/fullMap.png')} 
+        style={styles.miniMapImage} 
+      />
+    </View>
+  );
+}
+
+// Function to hide the scene screen and show the minimap in full 
+export function hideSceneScreen() {
+  const [isMapOpen, setIsMapOpen] = useState(false);
+
+  return (
+    <div style={{ padding: '20px' }}>
+      
+      {!isMapOpen && (
+        <img
+          src={require('./assets/buildings/fullMap.png')}
+          alt="MiniMap"
+          onClick={() => isMapOpen(true)}
+          style={{ cursor: 'pointer', borderRadius: '8px' }}
+        />
+      )}
+    </div>
+  );
+}
+
 const styles = StyleSheet.create({
   sceneContainer: {
     flex: 1,
@@ -204,5 +236,12 @@ const styles = StyleSheet.create({
   portraitImage: {
     width: "100%",
     height: "100%",
+  },
+  miniMapImage: {
+    width: 200,
+    height: 150,
+    borderRadius: 8,
+    left: 10,
+    top: 10,
   },
 });
