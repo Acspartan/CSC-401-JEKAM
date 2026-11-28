@@ -90,12 +90,7 @@ export default function GameWorld() {
               />
             </View>
 
-            <View style={styles.miniMap}>
-              <Image
-                source={require('./assets/buildings/fullMap.png')}
-                style={styles.miniMapImage}
-              />
-            </View>
+            
 
             <PlayerControls onMove={movePlayer} />
 
