@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import {
   View,
@@ -26,12 +26,8 @@ import buildings from "./data/buildings";
 // Game components
 import Building from "./components/Building";
 import PlayableCharacterView from "./components/PlayableCharacter";
-import QuestWindow, { initialQuests } from "./components/QuestWindow";
 import { SceneScreen, useSceneFlow } from "./SceneFlow";
-
-// Game systems
-import { isPlayerAtBuilding } from "./systems/buildingCollision";
-import { updateQuestProgress } from "./systems/questTracker";
+import { QuestHUD, useQuestFlow } from "./QuestFlow";
 
 // Character -> Player -> PlayableCharacter
 import {
@@ -45,52 +41,6 @@ const WORLD_HEIGHT = 1250;
 // Player dimensions
 const PLAYER_WIDTH = 40;
 const PLAYER_HEIGHT = 48;
-
-// Resolve building IDs and names to quest objective IDs.
-// These aliases account for different naming conventions in campus data.
-const QUEST_BUILDINGS = {
-  mckay: "mackay",
-  mackay: "mackay",
-  mckayhall: "mackay",
-  mackayhall: "mackay",
-  morsani: "morsani",
-  morsanihall: "morsani",
-  tech: "jenkins",
-  jenkins: "jenkins",
-  jenkinshealthandtechnologybuilding: "jenkins",
-  straz: "straz",
-  strazhall: "straz",
-  pepin: "pepin",
-  pepinstadium: "pepin",
-  library: "library",
-  macdonaldkelcelibrary: "library",
-};
-
-function resolveBuildingObjective(building) {
-  const candidates = [building.id, building.name, building.title, building.label];
-  for (const value of candidates) {
-    if (value == null) continue;
-    const normalized = String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
-    if (QUEST_BUILDINGS[normalized]) return QUEST_BUILDINGS[normalized];
-    if (normalized.includes("jenkins")) return "jenkins";
-    if (normalized.includes("macdonald") && normalized.includes("library")) return "library";
-    if (normalized.includes("pepin")) return "pepin";
-    if (normalized.includes("straz")) return "straz";
-  }
-  return null;
-}
-
-// Create initial quest state
-function createInitialQuests() {
-  return initialQuests.map((quest) => ({
-    ...quest,
-    objectives: (quest.objectives ?? []).map((objective) =>
-        typeof objective === "object" && objective !== null
-            ? { ...objective }
-            : objective
-    ),
-  }));
-}
 
 // Create a new player while preserving progress
 function copyPlayer(previous, level = previous.level) {
@@ -126,20 +76,15 @@ export default function GameWorld() {
       )
   );
 
-  // Store quest progress
-  const [quests, setQuests] = useState(createInitialQuests);
+  const awardQuestExperience = useCallback((amount) => {
+    setPlayer((previous) => {
+      const updated = copyPlayer(previous);
+      updated.gainExperience(amount);
+      return updated;
+    });
+  }, []);
 
-  // Controls quest window visibility
-  const [questOpen, setQuestOpen] = useState(false);
-
-  // Track visited buildings to avoid repeated updates
-  const visitedBuildings = useRef(new Set());
-
-  // Track movement between renders to complete directional objectives.
-  const previousPosition = useRef({ x: player.x, y: player.y });
-
-  // Track XP rewards already granted so quest state changes cannot grant them twice.
-  const claimedXpRewards = useRef(new Set());
+  const questFlow = useQuestFlow(player, awardQuestExperience);
 
   // Move player using PlayableCharacter class
   const movePlayer = useCallback((direction) => {
@@ -199,84 +144,6 @@ export default function GameWorld() {
     });
 
   }, []);
-
-  // Update movement quests only after the player actually changes position.
-  useEffect(() => {
-    const previous = previousPosition.current;
-    const completedActions = [];
-
-    if (player.x > previous.x) completedActions.push("east");
-    if (player.x < previous.x) completedActions.push("west");
-    if (player.y > previous.y) completedActions.push("south");
-    if (player.y < previous.y) completedActions.push("north");
-
-    previousPosition.current = { x: player.x, y: player.y };
-
-    if (completedActions.length > 0) {
-      // The player starts on the campus map; first movement confirms entry.
-      completedActions.push("campus");
-      setQuests((previousQuests) =>
-        completedActions.reduce(
-          (currentQuests, objectiveId) => updateQuestProgress(currentQuests, objectiveId),
-          previousQuests
-        )
-      );
-    }
-  }, [player.x, player.y]);
-
-  // Detect visits for both building-based quests.
-  useEffect(() => {
-    const newlyVisited = [];
-
-    buildings.forEach((building) => {
-      const objectiveId = resolveBuildingObjective(building);
-      if (!objectiveId || visitedBuildings.current.has(objectiveId)) return;
-
-      if (isPlayerAtBuilding(player, building)) {
-        visitedBuildings.current.add(objectiveId);
-        newlyVisited.push(objectiveId);
-      }
-    });
-
-    if (newlyVisited.length > 0) {
-      setQuests((previousQuests) =>
-        newlyVisited.reduce(
-          (currentQuests, objectiveId) => updateQuestProgress(currentQuests, objectiveId),
-          previousQuests
-        )
-      );
-    }
-  }, [player.x, player.y]);
-
-  // Grant numeric XP quest rewards. Player.gainExperience applies the level formula.
-  useEffect(() => {
-
-    const newlyCompletedXpQuests = quests.filter((quest) => {
-      if (!quest.completed || claimedXpRewards.current.has(quest.id)) {
-        return false;
-      }
-
-      const xpReward = String(quest.reward).match(/(\d+)\s*XP/i);
-      if (!xpReward) return false;
-
-      claimedXpRewards.current.add(quest.id);
-      return true;
-    });
-
-    const xpToAward = newlyCompletedXpQuests.reduce((total, quest) => {
-      const xpReward = String(quest.reward).match(/(\d+)\s*XP/i);
-      return total + (xpReward ? Number(xpReward[1]) : 0);
-    }, 0);
-
-    if (xpToAward > 0) {
-      setPlayer((previous) => {
-        const updated = copyPlayer(previous);
-        updated.gainExperience(xpToAward);
-        return updated;
-      });
-    }
-
-  }, [quests]);
 
   // Keyboard movement for Expo Web
   useEffect(() => {
@@ -446,23 +313,12 @@ export default function GameWorld() {
               </View>
             </View>
 
-            {questOpen && (
-                <View style={styles.questPanel}>
-                  <QuestWindow
-                      player={player}
-                      quests={quests}
-                  />
-                </View>
-            )}
-
-            <Pressable
-                style={styles.questButton}
-                onPress={() => setQuestOpen((previous) => !previous)}
-            >
-              <Text style={styles.questButtonText}>
-                {questOpen ? "Close Quests" : "Quests"}
-              </Text>
-            </Pressable>
+            <QuestHUD
+              player={player}
+              quests={questFlow.quests}
+              questOpen={questFlow.questOpen}
+              onToggle={questFlow.toggleQuestWindow}
+            />
           </>
         )}
 
@@ -485,38 +341,6 @@ const styles = StyleSheet.create({
     width: WORLD_WIDTH,
     height: WORLD_HEIGHT,
     backgroundColor: "#7ec850",
-  },
-
-  // Fixed Quest Log and Character Status panel
-  questPanel: {
-    position: "absolute",
-    bottom: 90,
-    left: 20,
-    width: 300,
-    height: 520,
-    zIndex: 1500,
-    elevation: 10,
-  },
-
-  // Bottom-left Quest button
-  questButton: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    backgroundColor: "#252525",
-    borderWidth: 2,
-    borderColor: "#888888",
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    zIndex: 2000,
-    elevation: 11,
-  },
-
-  questButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 
   dialogPanel: {
